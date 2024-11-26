@@ -1,2 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Microsoft.Extensions.Configuration;
+
+IConfigurationRoot config = new ConfigurationBuilder()
+    .AddJsonFile("Properties\\launchSettings.json")
+    .AddEnvironmentVariables()
+    .Build();
