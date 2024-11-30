@@ -157,9 +157,17 @@ class AppManager
 
         foreach (CodingSession codingSession in codingSessions)
         {
-            Style? activeStat = codingSession.ActiveStat ? Style.Parse("chartreuse2") : null;
-
+            Style? activeStat = codingSession.ActiveStat ? Style.Parse("green") : null;
+            sessionsTable.AddRow((Markup[])[
+                new Markup(codingSession.Id.ToString(), activeStat),
+                new Markup(codingSession.Name, activeStat),
+                new Markup(codingSession.StartTime.ToString(), activeStat),
+                new Markup(codingSession.EndTime.ToString(), activeStat),
+                new Markup(codingSession.Duration, activeStat)
+            ]);
         }
+        AnsiConsole.Write(sessionsTable);
+        AnsiConsole.MarkupLine("[silver]info: All lines listed in green color are still active![/]");
     }
 
     private void ViewCodingSessions()
