@@ -1,21 +1,22 @@
 ﻿using Spectre.Console;
+using System.Globalization;
 
 class AppManager
 {
-    private const string START_CODE_SESH = "Start recording actual Code compiling session";
-    private const string END_CODE_SESH = "End or stop active Code compiling session(s)";
-    
-    private const string SAVE_ACTIVE_CODETIME_SESH = "Save your newly recorded Coding sessions";
-    private const string VIEW_ALL_STORED_SESSIONS = "View all stored sessions and coding times";
-    private const string CHANGE_TIME_IN_SESSION = "";
-    private const string DELETE_CODE_SESH_DATA = "Delete your already saved Coding sessions and logs";
+    private const string START_CODE_SESH = "Start recording actual code compiling session.";
+    private const string END_CODE_SESH = "End or stop active code compiling session(s).";
+
+    private const string SAVE_ACTIVE_CODETIME_SESH = "Save your newly recorded coding sessions.";
+    private const string VIEW_ALL_STORED_SESSIONS = "View all stored sessions and coding times.";
+    private const string CHANGE_TIME_IN_SESSION = "Change properties of a record.";
+    private const string DELETE_CODE_SESH_DATA = "Delete your already saved coding sessions and logs";
 
     private const string EXIT = "Close Application";
 
-    private DatabaseManager dDatabaseManager;
+    private DatabaseManager _databaseManager;
     public AppManager(DatabaseManager databaseManager)
     {
-        dDatabaseManager = databaseManager;
+        _databaseManager = databaseManager;
     }
 
     public void AppStart()
@@ -24,7 +25,7 @@ class AppManager
         {
             MainMenu();
         }
-        
+
     }
 
     private void MainMenu()
@@ -38,8 +39,9 @@ class AppManager
             SAVE_ACTIVE_CODETIME_SESH,
 
             VIEW_ALL_STORED_SESSIONS,
-            CHANGE_TIME_IN_SESSION,
+            // CHANGE_TIME_IN_SESSION,
             DELETE_CODE_SESH_DATA,
+
 
             EXIT,
         };
@@ -76,12 +78,12 @@ class AppManager
                 SaveCodeTimeSession();
                 break;
             case VIEW_ALL_STORED_SESSIONS:
-                ViewAllSessions();
+                ViewCodingSessions();
                 break;
 
-            case CHANGE_TIME_IN_SESSION:
-                ChangeCodingSession();
-                break;
+            //case CHANGE_TIME_IN_SESSION:
+            //    ChangeCodingSession();
+            //    break;
             case DELETE_CODE_SESH_DATA:
                 DeleteCodingSession();
                 break;
@@ -93,34 +95,92 @@ class AppManager
 
     private void StartSession()
     {
-        throw new NotImplementedException();
+        if (_databaseManager.ActiveCodingSession != null)
+        {
+            AnsiConsole.MarkupLine("[red]Error! -> You have already at least one active session. Press any key to continue.[/]");
+            Console.ReadKey();
+            return;
+        }
+        AnsiConsole.Clear();
+
+        AnsiConsole.MarkupLine("Starting new code session recording.");
+        CodingSession codingSession = new CodingSession()
+        {
+            StartTime = DateTime.UtcNow
+        };
+
+        _databaseManager.CreateCodeSession(codingSession);
+        AnsiConsole.MarkupLine("[yellow]Coding session started![/]");
+        AnsiConsole.MarkupLine($"Start time of this session: [underline]{codingSession.StartTime}[/]");
+        AnsiConsole.MarkupLine("\nPress any key to continue...");
+        Console.ReadKey();
+
     }
 
     private void EndSession()
     {
-        throw new NotImplementedException();
+        CodingSession? codingSession = _databaseManager.ActiveCodingSession();
+        if (codingSession == null)
+        {
+            AnsiConsole.MarkupLine("[red]Error! -> There is no active coding session to end.[/]");
+            Console.ReadKey();
+            return;
+        }
+
+        AnsiConsole.Clear();
+        AnsiConsole.MarkupLine("Closing actual coding session.");
+
+        codingSession.EndTime = DateTime.Now;
+        codingSession.ActiveStat = false;
+        _databaseManager.UpdateCodingSession(codingSession);
+
+        AnsiConsole.MarkupLine("[yellow]Coding session ended.[/]");
+        AnsiConsole.MarkupLine($"End time of session: [underline]{codingSession.EndTime}[/]");
+        AnsiConsole.MarkupLine($"\nDuration: [yellow]{codingSession.Duration}[/]");
+        Console.ReadKey();
     }
 
     private void SaveCodeTimeSession()
     {
-        throw new NotImplementedException();
+        AnsiConsole.Clear();
+
+
+        AnsiConsole.MarkupLine("[springgreen2_1]Coding session logged![/]");
     }
 
-
-    private void ViewAllSessions()
+    private void ListCodingSessions(List<CodingSession> codingSessions)
     {
-        throw new NotImplementedException();
+        Table sessionsTable = new Table();
+        sessionsTable.Title(new TableTitle("[underline]List of all recorded sessions of coding[/]"));
+        sessionsTable.AddColumns("Id, Name, StartTime, EndTime, Duration");
+        sessionsTable.Columns[0].Width = 5;
+
+        foreach (CodingSession codingSession in codingSessions)
+        {
+            Style? activeStat = codingSession.ActiveStat ? Style.Parse("chartreuse2") : null;
+
+        }
     }
 
-    private void ChangeCodingSession()
+    private void ViewCodingSessions()
     {
-        throw new NotImplementedException();
+        List<CodingSession> codingSessions = _databaseManager.GetAllSessionsData();
+        AnsiConsole.Clear();
+
+        ListCodingSessions(codingSessions);
+        AnsiConsole.MarkupLine("[springgreen2_1]Press any key to get back to the menu.[/]");
+        Console.ReadKey();
     }
 
+
+    // !!
     private void DeleteCodingSession()
     {
-        throw new NotImplementedException();
-    }
+        AnsiConsole.Clear();
 
+        List<CodingSession> codingSessions = _databaseManager.GetAllSessionsData();
+        ListCodingSessions(codingSessions);
+
+    }
 }
 

@@ -3,10 +3,10 @@
     public int Id { get; set; }
 
     public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public DateTime _endTime {  get; set; }
+    public DateTime EndTime { get {return ActiveStat ? DateTime.Now : _endTime; } set { _endTime = value; } }
+    public DateTime _endTime { get; set; }
 
-    public string? Duration { get; set; }
+    public string Duration { get { return (EndTime - StartTime).ToString(@"hh\:mm\:ss"); } set { } }
     public string? Name { get; set; }
     public bool ActiveStat { get; set; }
 
