@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "CodingTracker_ConsoleApp.DreamFXX": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\marti\\_working-repo\\CodeReviews.Console.CodingTracker\\CodingTracker_ConsoleApp.DreamFXX",
+      "environmentVariables": {
+        "connectionString": "Data Source=Databases\\CodingtimeData.db;Cache=Shared;"
+      },
+      "sqlDebugging": true,
+      "hotReloadEnabled": false
+    }
+  }
+}
