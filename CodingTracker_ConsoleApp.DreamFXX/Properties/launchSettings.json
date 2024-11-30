@@ -2,7 +2,7 @@
   "profiles": {
     "CodingTracker_ConsoleApp.DreamFXX": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Users\\marti\\CodeReviews.Console.CodingTracker\\CodingTracker_ConsoleApp.DreamFXX",
+      "workingDirectory": "C:\\Users\\marti\\_CodeReviews.Console.CodingTracker\\CodingTracker_ConsoleApp.DreamFXX",
       "environmentVariables": {
         "connectionString": "Data Source=Databases\\CodingtimeData.db;Cache=Shared;"
       },
