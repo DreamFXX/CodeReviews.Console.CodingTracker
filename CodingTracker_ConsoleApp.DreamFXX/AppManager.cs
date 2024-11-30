@@ -91,22 +91,7 @@ class AppManager
         }
     }
 
-    private void DeleteCodingSession()
-    {
-        throw new NotImplementedException();
-    }
-
-    private void ChangeCodingSession()
-    {
-        throw new NotImplementedException();
-    }
-
-    private void ViewAllSessions()
-    {
-        throw new NotImplementedException();
-    }
-
-    private void SaveCodeTimeSession()
+    private void StartSession()
     {
         throw new NotImplementedException();
     }
@@ -116,9 +101,26 @@ class AppManager
         throw new NotImplementedException();
     }
 
-    private void StartSession()
+    private void SaveCodeTimeSession()
     {
         throw new NotImplementedException();
     }
+
+
+    private void ViewAllSessions()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void ChangeCodingSession()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void DeleteCodingSession()
+    {
+        throw new NotImplementedException();
+    }
+
 }
 
