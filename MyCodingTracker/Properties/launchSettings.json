@@ -2,8 +2,9 @@
   "profiles": {
     "MyCodingTrack": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Users\\marti\\_CodeReviews.Console.CodingTracker\\MyCodingTrack",
-      "sqlDebugging": true
+      "workingDirectory": "C:\\Users\\marti\\_CodeReviews.Console.CodingTracker\\MyCodingTracker",
+      "sqlDebugging": true,
+      "nativeDebugging": true
     }
   }
 }

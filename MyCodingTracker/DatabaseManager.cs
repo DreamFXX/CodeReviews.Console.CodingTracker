@@ -1,9 +1,9 @@
-﻿using Microsoft.Data;
+﻿using System.Data;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using System.Configuration;
 
-namespace MyCodingTrack
+namespace MyCodingTracker
 {
     internal class DatabaseManager
     {

@@ -1,4 +1,4 @@
-﻿namespace MyCodingTrack
+﻿namespace MyCodingTracker
 {
     internal class UserInput
     {
