@@ -1,4 +1,7 @@
-﻿using Spectre.Console;
+﻿using System.Data.SqlTypes;
+using System.Reflection.Metadata;
+using Spectre.Console;
+using SQLitePCL;
 
 namespace MyCodingTracker
 {
@@ -21,7 +24,7 @@ namespace MyCodingTracker
                     "Delete coding session",
                     "Close application",
                 }));
-
+            StartProgram(menuPrompt);
         }
 
         public static void StartProgram(string menuPrompt)
@@ -38,7 +41,7 @@ namespace MyCodingTracker
                         ViewAllSessions();
                         break;
                     case "Start a new session record":
-                        StartNewSession();
+                        GetRecordsToInsert();
                         break;
                     case "Change an existing session data":
                         ChangeSessionData();
@@ -49,8 +52,6 @@ namespace MyCodingTracker
                     case "Close application":
                         Environment.Exit(0);
                         break;
-                    case "":
-                        break;
                     default:
                         AnsiConsole.MarkupLine("[red]This menu route is broken. Wait for fix release![/]");
                         break;
@@ -58,25 +59,122 @@ namespace MyCodingTracker
             }
         }
 
-        private static void DeleteSession()
+        private static void GetRecordsToInsert()
         {
-            throw new NotImplementedException();
+            AnsiConsole.Clear();
+
+            string date = Input.GetDate();
+
+            string startTime = Input.GetStartTime();
+
+            string endTime = Input.GetEndTime();
+
+            string duration = Input.GetDuration();
+
+            DbManager.InsertRecord(date, startTime, endTime, duration);
+
+            ViewRecords();
         }
 
-        private static void ChangeSessionData()
+        private static void DisplayDeleteContextMenu()
         {
-            throw new NotImplementedException();
+            Console.WriteLine("b to Go Back");
+            Console.WriteLine("d to Delete Record: ");
         }
 
-        private static void StartNewSession()
+        private static void GetRecordsToDelete()
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            ViewRecords();
+
+            DisplayDeleteContextMenu();
+            string choice = Console.ReadLine();
+            while (choice != "b")
+            {
+                switch (choice)
+                {
+                    case "d":
+                        DbManager.DeleteRecord(Input.GetDate());
+                        ViewRecords();
+                        break;
+                    default:
+                        Console.WriteLine("Invalid Choice!");
+                        ViewRecords();
+                        break;
+                }
+                DisplayDeleteContextMenu();
+                choice = Console.ReadLine();
+            }
+            ViewRecords();
         }
 
-        private static void ViewAllSessions()
+        private static void DisplayUpdateContextMenu()
         {
-            throw new NotImplementedException();
+            string[] types;
+            var updateMenu = AnsiConsole.Prompt(new SelectionPrompt<string>()
+                .Title("[underline][green]Select type of Data you are going to change[/][/]")
+                .PageSize(5)
+                .AddChoices<string>(new string[]
+                {
+                "Date", "Start and End time", "Change all attributes of session", "", "Go back to main menu"
+                }
+                ));
+        }
+
+        private static void SelectRecordToUpdate()
+        {
+            Console.Clear();
+            ViewAllRecords();
+
+            string? newDate, startTime, endTime, duration;
+            DbManager.ReadFromDb();
+
+            string oldDate = Input.GetDate();
+
+            DisplayUpdateContextMenu();
+            string choice = Console.ReadLine();
+            while (choice != "b")
+            {
+                switch (choice)
+                {
+                    case "d":
+                        newDate = Input.GetDate();
+                        DbManager.UpdateRecord(oldDate, newDate, null, null, null);
+                        break;
+                    case "t":
+                        startTime = Input.GetStartTime();
+                        endTime = Input.GetEndTime();
+                        duration = Input.GetDuration();
+                        DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
+                        break;
+                    case "a":
+                        newDate = Input.GetDate();
+                        startTime = Input.GetStartTime();
+                        endTime = Input.GetEndTime();
+                        duration = Input.GetDuration();
+                        DbManager.UpdateRecord(oldDate, newDate, startTime, endTime, duration);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice! Press Enter to continue...");
+                        Console.ReadLine();
+                        break;
+                }
+                ViewAllRecords();
+                DisplayUpdateContextMenu();
+                choice = Console.ReadLine();
+            }
+
+            Console.Clear();
+        }
+
+        private static void ViewRecords()
+        {
+            DisplayRecords.View();
+        }
+
+        private static void ViewAllRecords()
+        {
+            DisplayRecords.ViewAll();
         }
     }
 }
-
