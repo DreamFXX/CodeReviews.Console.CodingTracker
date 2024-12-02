@@ -1,7 +1,6 @@
-﻿using System.Data.SqlTypes;
-using System.Reflection.Metadata;
+﻿using MyCodingTracker.Models;
 using Spectre.Console;
-using SQLitePCL;
+using System.Reflection;
 
 namespace MyCodingTracker
 {
@@ -10,9 +9,8 @@ namespace MyCodingTracker
         private static readonly DatabaseManager DbManager = new();
         private static readonly UserInput Input = new();
 
-        static void MainMenu()
+        private static void MainMenu()
         {
-            
             string menuPrompt = AnsiConsole.Prompt(new SelectionPrompt<string>()
                 .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
                 .PageSize(10)
@@ -30,33 +28,34 @@ namespace MyCodingTracker
         public static void StartProgram(string menuPrompt)
         {
             DbManager.CreateDatabase();
-
-            MainMenu();
-            
             while (menuPrompt != "Close application")
             {
                 switch (menuPrompt)
                 {
                     case "View all tracked sessions":
-                        ViewAllRecords();
+                        DisplayInTable();
                         break;
                     case "Start a new session record":
                         GetRecordsToInsert();
                         break;
                     case "Change an existing session data":
-                        ChangeSessionData();
+                        DisplayUpdateContextMenu();
                         break;
-                    case "Delete coding session data":
+                    case "Delete coding session":
                         DeleteContextMenu();
                         break;
-                    case "Close application":
-                        Environment.Exit(0);
-                        break;
                     default:
-                        AnsiConsole.MarkupLine("[red]This menu route is broken. Wait for fix release![/]");
+                        AnsiConsole.MarkupLine("[red]Invalid selection![/]");
                         break;
                 }
+
+                var backtoMenu = AnsiConsole.Confirm("Do you want to go back to the menu?");
+                if (backtoMenu)
+                {
+                    MainMenu();
+                }
             }
+            Environment.Exit(0);
         }
 
         private static void GetRecordsToInsert()
@@ -75,9 +74,8 @@ namespace MyCodingTracker
 
         private static void DisplayUpdateContextMenu()
         {
-            string[] types;
             var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
-                .Title("[underline][green]Select type of Data you are going to change[/][/]")
+                .Title("[green]Select the type of Data you want to change.[/][/]")
                 .PageSize(5)
                 .AddChoices<string>(new[]
                 {
@@ -87,7 +85,7 @@ namespace MyCodingTracker
                     "Go Back to Main Menu"
                 }));
 
-            if (updateChoice == "Go Back to Main Menu")
+            if (updateChoice != "Go Back to Main Menu")
             {
                 Console.Clear();
                 return;
@@ -97,8 +95,8 @@ namespace MyCodingTracker
 
         private static void SelectRecordToUpdate(string updateChoice)
         {
-            Console.Clear();
-            ViewAllRecords();
+            AnsiConsole.Clear();
+            DisplayInTable();
 
             string oldDate = Input.GetDate();
             DisplayUpdateContextMenu();
@@ -127,7 +125,7 @@ namespace MyCodingTracker
                         break;
                 }
                 AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
-                ViewAllRecords();
+                DisplayInTable();
         }
 
         private static void DeleteContextMenu()
@@ -152,12 +150,35 @@ namespace MyCodingTracker
 
         private static void ViewRecords()
         {
-            DisplayRecords.View();
+            throw new NotImplementedException();
         }
 
-        private static void ViewAllRecords()
+        public static void DisplayInTable()
         {
-            DisplayRecords.ViewAll();
+            var sessions = DbManager.ReadFromDb();
+            if (!sessions.Any())
+            {
+                AnsiConsole.MarkupLine("[red]No records found![/]");
+                return;
+            }
+            var table = new Table()
+               .Border(TableBorder.Rounded)
+               .BorderColor(Color.Blue)
+               .Title("[yellow bold]Your tracked coding sessions[/]");
+            var type = typeof(string);
+            var properties = type.GetProperties();
+
+            foreach (var property in properties)
+            {
+                table.AddColumn(property.Name);
+            }
+
+            foreach (var dataItem in data)
+            {
+                table.AddRow(properties.Select(p => p.GetValue(dataItem)?.ToString() ?? string.Empty).ToArray());
+            }
+
+            AnsiConsole.Write(table.Expand());
         }
-    }
+        }
 }
