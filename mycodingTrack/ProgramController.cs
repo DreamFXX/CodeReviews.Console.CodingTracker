@@ -7,7 +7,7 @@ namespace MyCodingTrack
         private static readonly DatabaseManager DbManager = new();
         private static readonly UserInput Input = new();
 
-        internal static void MainMenu()
+        private static void MainMenu()
         {
             var selectRoute = AnsiConsole.Prompt(new SelectionPrompt<string>()
                 .Title("Welcome in Coding Time Tracker.\n\n[underline][yellow]MAIN MENU[/][/]")
@@ -20,16 +20,16 @@ namespace MyCodingTrack
                     "Delete coding session",
                     "Close application",
                 }));
-            
+            StartProgram(selectRoute);
         }
 
-        public static void StartProgram(string selectRoute)
+        public static void StartProgram(string selection)
         {
             DbManager.CreateDatabase();
 
             MainMenu();
 
-            while ()
+            while (selection != string "Close Application")
             {
                 
 
