@@ -38,7 +38,7 @@ namespace MyCodingTracker
                 switch (menuPrompt)
                 {
                     case "View all tracked sessions":
-                        ViewAllSessions();
+                        ViewAllRecords();
                         break;
                     case "Start a new session record":
                         GetRecordsToInsert();
@@ -46,8 +46,8 @@ namespace MyCodingTracker
                     case "Change an existing session data":
                         ChangeSessionData();
                         break;
-                    case "Delete coding session":
-                        DeleteSession();
+                    case "Delete coding session data":
+                        DeleteContextMenu();
                         break;
                     case "Close application":
                         Environment.Exit(0);
@@ -64,90 +64,58 @@ namespace MyCodingTracker
             AnsiConsole.Clear();
 
             string date = Input.GetDate();
-
             string startTime = Input.GetStartTime();
-
             string endTime = Input.GetEndTime();
-
             string duration = Input.GetDuration();
 
             DbManager.InsertRecord(date, startTime, endTime, duration);
-
-            ViewRecords();
-        }
-
-        private static void DisplayDeleteContextMenu()
-        {
-            Console.WriteLine("b to Go Back");
-            Console.WriteLine("d to Delete Record: ");
-        }
-
-        private static void GetRecordsToDelete()
-        {
-            Console.Clear();
-            ViewRecords();
-
-            DisplayDeleteContextMenu();
-            string choice = Console.ReadLine();
-            while (choice != "b")
-            {
-                switch (choice)
-                {
-                    case "d":
-                        DbManager.DeleteRecord(Input.GetDate());
-                        ViewRecords();
-                        break;
-                    default:
-                        Console.WriteLine("Invalid Choice!");
-                        ViewRecords();
-                        break;
-                }
-                DisplayDeleteContextMenu();
-                choice = Console.ReadLine();
-            }
+            AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved.");
             ViewRecords();
         }
 
         private static void DisplayUpdateContextMenu()
         {
             string[] types;
-            var updateMenu = AnsiConsole.Prompt(new SelectionPrompt<string>()
+            var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
                 .Title("[underline][green]Select type of Data you are going to change[/][/]")
                 .PageSize(5)
-                .AddChoices<string>(new string[]
+                .AddChoices<string>(new[]
                 {
-                "Date", "Start and End time", "Change all attributes of session", "", "Go back to main menu"
-                }
-                ));
+                    "Update Date",
+                    "Update Start and End Time",
+                    "Update All Attributes",
+                    "Go Back to Main Menu"
+                }));
+
+            if (updateChoice == "Go Back to Main Menu")
+            {
+                Console.Clear();
+                return;
+            }
+            SelectRecordToUpdate(updateChoice);
         }
 
-        private static void SelectRecordToUpdate()
+        private static void SelectRecordToUpdate(string updateChoice)
         {
             Console.Clear();
             ViewAllRecords();
 
-            string? newDate, startTime, endTime, duration;
-            DbManager.ReadFromDb();
-
             string oldDate = Input.GetDate();
-
             DisplayUpdateContextMenu();
-            string choice = Console.ReadLine();
-            while (choice != "b")
-            {
-                switch (choice)
+
+                switch (updateChoice)
                 {
-                    case "d":
-                        newDate = Input.GetDate();
+                    case "Update Date":
+                        string newDate = Input.GetDate();
                         DbManager.UpdateRecord(oldDate, newDate, null, null, null);
                         break;
-                    case "t":
-                        startTime = Input.GetStartTime();
-                        endTime = Input.GetEndTime();
-                        duration = Input.GetDuration();
+                    case "Update Start and End Time":
+                        string startTime = Input.GetStartTime();
+                        string endTime = Input.GetEndTime();
+                        string duration = Input.GetDuration();
                         DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
                         break;
-                    case "a":
+                    case "Update All Attributes":
                         newDate = Input.GetDate();
                         startTime = Input.GetStartTime();
                         endTime = Input.GetEndTime();
@@ -155,16 +123,31 @@ namespace MyCodingTracker
                         DbManager.UpdateRecord(oldDate, newDate, startTime, endTime, duration);
                         break;
                     default:
-                        Console.WriteLine("Invalid choice! Press Enter to continue...");
-                        Console.ReadLine();
+                        AnsiConsole.MarkupLine("[red]Invalid selection. Returning to the main menu.[/]");
                         break;
                 }
+                AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
                 ViewAllRecords();
-                DisplayUpdateContextMenu();
-                choice = Console.ReadLine();
-            }
+        }
 
-            Console.Clear();
+        private static void DeleteContextMenu()
+        {
+            AnsiConsole.Clear();
+            var confirmation = AnsiConsole.Confirm("[green]Do you really want to delete record?[/]");
+            if (confirmation)
+            {
+                Console.Clear();
+                ViewRecords();
+
+                string dateToDelete = Input.GetDate();
+                DbManager.DeleteRecord(dateToDelete);
+
+                AnsiConsole.MarkupLine($"[green]Record for {dateToDelete} deleted successfully![/]");
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[red]Deleting was cancelled.[/]");
+            }
         }
 
         private static void ViewRecords()
