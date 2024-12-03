@@ -13,7 +13,5 @@ My second C# application with CRUD operations.
 - Make validation class file and finish all places that needs to be validated.
 - Write what i experienced and learned throughout finishing this project.
 - Create better and cleaner structure and hierarchy of classes and methods.
-- Fix App Starting to go straight to routing without the error prompt.
-- Test the app and its functionality.
 
 Updated 3.12.2024
