@@ -43,9 +43,6 @@ namespace MyCodingTracker
                     case "Delete coding session":
                         DeleteContextMenu();
                         break;
-                    case "":
-                        return;
-                        break;
                     default:
                         AnsiConsole.MarkupLine("[red]Invalid selection![/]");
                         break;

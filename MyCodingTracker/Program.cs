@@ -4,9 +4,7 @@
     {
         static void Main(string[] args)
         {
-            ProgramController.StartProgram("");
-
-            Console.ReadKey();
+            ProgramController.StartProgram("Start");
         }
     }
 }
