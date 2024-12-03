@@ -1,5 +1,4 @@
-﻿using MyCodingTracker.Models;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace MyCodingTracker
 {
@@ -8,27 +7,15 @@ namespace MyCodingTracker
         private static readonly DatabaseManager DbManager = new();
         private static readonly UserInput Input = new();
 
-        private static void MainMenu()
-        {
-            string menuPrompt = AnsiConsole.Prompt(new SelectionPrompt<string>()
-                .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
-                .PageSize(10)
-                .AddChoices(new[]
-                {
-                    "View all tracked sessions",
-                    "Start a new session record",
-                    "Change an existing session data",
-                    "Delete coding session",
-                    "Close application",
-                }));
-            StartProgram(menuPrompt);
-        }
-
-        public static void StartProgram(string menuPrompt)
+        public static void StartProgram()
         {
             DbManager.CreateDatabase();
-            while (menuPrompt != "Close application")
+
+            bool running = true;
+            while (running)
             {
+                string menuPrompt = MainMenu();
+
                 switch (menuPrompt)
                 {
                     case "View all tracked sessions":
@@ -43,18 +30,34 @@ namespace MyCodingTracker
                     case "Delete coding session":
                         DeleteContextMenu();
                         break;
+                    case "Close application":
+                        running = false;
+                        break;
                     default:
-                        AnsiConsole.MarkupLine("[red]Invalid selection![/]");
+                        AnsiConsole.MarkupLine("[red]Invalid selection! Press any key to go back to the menu.[/]");
+                        Console.ReadKey();
                         break;
                 }
-
-                var backtoMenu = AnsiConsole.Confirm("Do you want to go back to the menu?");
-                if (backtoMenu)
-                {
-                    MainMenu();
-                }
             }
-            Environment.Exit(0);
+            AnsiConsole.MarkupLine("[green]Thank you for using Coding Time Tracker![/]");
+            Console.ReadKey();
+        }
+
+        internal static string MainMenu()
+        {
+            return 
+                AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
+                .PageSize(10)
+                .AddChoices(new[]
+                {
+                "View all tracked sessions",
+                "Start a new session record",
+                "Change an existing session data",
+                "Delete coding session",
+                "Close application",
+                }));
         }
 
         private static void GetRecordsToInsert()
@@ -67,14 +70,15 @@ namespace MyCodingTracker
             string duration = Input.GetDuration();
 
             DbManager.InsertRecord(date, startTime, endTime, duration);
-            AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved.");
-            ViewSingleRecord();
+
+            AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved. Press any key to return to the main menu.[/]");
+            Console.ReadKey();
         }
 
         private static void DisplayUpdateContextMenu()
         {
             var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
-                .Title("[green]Select the type of Data you want to change.[/][/]")
+                .Title("[green]Select the type of Data you want to change.[/]")
                 .PageSize(5)
                 .AddChoices(new[]
                 {
@@ -84,12 +88,7 @@ namespace MyCodingTracker
                     "Go Back to Main Menu"
                 }));
 
-            if (updateChoice != "Go Back to Main Menu")
-            {
-                Console.Clear();
-                return;
-            }
-            SelectRecordToUpdate(updateChoice);
+           SelectRecordToUpdate(updateChoice);
         }
 
         private static void SelectRecordToUpdate(string updateChoice)
@@ -98,7 +97,6 @@ namespace MyCodingTracker
             ViewAllRecords();
 
             string oldDate = Input.GetDate();
-            DisplayUpdateContextMenu();
 
             switch (updateChoice)
             {
@@ -121,6 +119,7 @@ namespace MyCodingTracker
                     break;
                 default:
                     AnsiConsole.MarkupLine("[red]Invalid selection. Returning to the main menu.[/]");
+                    MainMenu();
                     break;
             }
             AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
@@ -130,16 +129,21 @@ namespace MyCodingTracker
         private static void DeleteContextMenu()
         {
             AnsiConsole.Clear();
-            var confirmation = AnsiConsole.Confirm("[green]Do you really want to delete record?[/]");
+            var confirmation = AnsiConsole.Confirm("[green]Do you really want to delete records?[/]");
             if (confirmation)
             {
                 Console.Clear();
-                ViewSingleRecord();
-
                 string dateToDelete = Input.GetDate();
-                DbManager.DeleteRecord(dateToDelete);
-
-                AnsiConsole.MarkupLine($"[green]Record for {dateToDelete} deleted successfully![/]");
+                var record = DbManager.ReadSingleRecord(dateToDelete);
+                if (record != null)
+                {
+                    DbManager.DeleteRecord(dateToDelete);
+                    AnsiConsole.MarkupLine($"[green]Record for {dateToDelete} deleted successfully![/]");
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine($"[red]No record found for {dateToDelete}![/]");
+                }
             }
             else
             {
@@ -206,7 +210,8 @@ namespace MyCodingTracker
                 );
             }
 
-            AnsiConsole.Write(table.Expand);
+            AnsiConsole.Write(table);
+            Console.ReadKey();
         }
 
     }
