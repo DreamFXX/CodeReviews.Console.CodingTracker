@@ -123,7 +123,7 @@ namespace MyCodingTracker
                     break;
             }
             AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
-            ViewAllRecords();
+            Console.ReadKey();
         }
 
         private static void DeleteContextMenu()
