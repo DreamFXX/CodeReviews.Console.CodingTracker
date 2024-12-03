@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using Dapper;
-using System.Configuration;
 using MyCodingTracker.Models;
 using Spectre.Console;
 
