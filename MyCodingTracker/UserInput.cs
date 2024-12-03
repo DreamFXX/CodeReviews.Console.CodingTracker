@@ -11,26 +11,26 @@ namespace MyCodingTracker
 
         public string GetDate()
         {
-            this.Date = AnsiConsole.Ask<string>(
+                Date = AnsiConsole.Ask<string>(
                 ("[yellow]Please, enter the date of your session. Specify date in this exact format![/]\n-[green](dd-MM-yy)[/] -> "));
 
-            return this.Date;
+            return Date;
         }
 
         public string GetStartTime()
         {
-            this.StartTime = AnsiConsole.Ask<string>
+                StartTime = AnsiConsole.Ask<string>
                 ("[yellow]Enter the time your session started. Specify time in this format![/]\n-[green](hh:mm)[/] -> ");    
 
-            return this.StartTime;
+            return StartTime;
         }
 
         public string GetEndTime()
         {
-            this.EndTime = AnsiConsole.Ask<string>
+            EndTime = AnsiConsole.Ask<string>
                 ("[yellow]Enter the time your session ended. Specify time in this format![/]\n-[green](hh:mm)[/] -> ");
 
-            return this.EndTime;
+            return EndTime;
         }
 
         public string GetDuration()

@@ -1,5 +1,4 @@
-﻿using MyCodingTracker.Models;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace MyCodingTracker
 {
@@ -8,27 +7,14 @@ namespace MyCodingTracker
         private static readonly DatabaseManager DbManager = new();
         private static readonly UserInput Input = new();
 
-        private static void MainMenu()
-        {
-            string menuPrompt = AnsiConsole.Prompt(new SelectionPrompt<string>()
-                .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
-                .PageSize(10)
-                .AddChoices(new[]
-                {
-                    "View all tracked sessions",
-                    "Start a new session record",
-                    "Change an existing session data",
-                    "Delete coding session",
-                    "Close application",
-                }));
-            StartProgram(menuPrompt);
-        }
-
-        public static void StartProgram(string menuPrompt)
+        public static void StartProgram()
         {
             DbManager.CreateDatabase();
-            while (menuPrompt != "Close application")
+            bool running = true;
+            while (running)
             {
+                string menuPrompt = MainMenu();
+
                 switch (menuPrompt)
                 {
                     case "View all tracked sessions":
@@ -43,18 +29,36 @@ namespace MyCodingTracker
                     case "Delete coding session":
                         DeleteContextMenu();
                         break;
+                    case "Close application":
+                        running = false;
+                        break;
                     default:
-                        AnsiConsole.MarkupLine("[red]Invalid selection![/]");
+                        AnsiConsole.MarkupLine("[red]Invalid selection! Press any key to go back to the menu.[/]");
+                        Console.ReadKey();
                         break;
                 }
-
-                var backtoMenu = AnsiConsole.Confirm("Do you want to go back to the menu?");
-                if (backtoMenu)
-                {
-                    MainMenu();
-                }
             }
-            Environment.Exit(0);
+
+            AnsiConsole.MarkupLine("[green]Thank you for using Coding Time Tracker![/]");
+            Console.ReadKey();
+
+        }
+
+        internal static string MainMenu()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
+                    .PageSize(10)
+                    .AddChoices(new[]
+                    {
+                "View all tracked sessions",
+                "Start a new session record",
+                "Change an existing session data",
+                "Delete coding session",
+                "Close application",
+                    })
+            );
         }
 
         private static void GetRecordsToInsert()
@@ -67,8 +71,8 @@ namespace MyCodingTracker
             string duration = Input.GetDuration();
 
             DbManager.InsertRecord(date, startTime, endTime, duration);
-            AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved.");
-            ViewSingleRecord();
+            AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved. Press any key to continue.[/]");
+            Console.ReadKey();
         }
 
         private static void DisplayUpdateContextMenu()
@@ -176,7 +180,7 @@ namespace MyCodingTracker
             );
             AnsiConsole.Write(table);
         }
-    
+
         public static void ViewAllRecords()
         {
             AnsiConsole.Clear();
@@ -206,7 +210,8 @@ namespace MyCodingTracker
                 );
             }
 
-            AnsiConsole.Write(table.Expand);
+            AnsiConsole.Write(table);
+            Console.ReadKey();
         }
 
     }

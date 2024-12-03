@@ -5,6 +5,10 @@
       "workingDirectory": "C:\\Users\\marti\\_CodeReviews.Console.CodingTracker\\MyCodingTracker",
       "sqlDebugging": true,
       "nativeDebugging": true
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
     }
   }
 }
