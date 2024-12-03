@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Dapper;
 using System.Configuration;
-using System.Reflection;
 using MyCodingTracker.Models;
 using Spectre.Console;
 
@@ -15,6 +14,7 @@ namespace MyCodingTracker
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
+                connection.Open();
                 connection.Execute(@"CREATE TABLE IF NOT EXISTS MyCodingTracker (
                                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                                         Date TEXT,
@@ -28,6 +28,7 @@ namespace MyCodingTracker
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
+                connection.Open();
                 connection.Execute(@$"INSERT INTO MyCodingTracker (Date, StartTime, EndTime, Duration)
                                        VALUES('{date}', '{startTime}', '{endTime}', '{duration}')");
             }
@@ -37,6 +38,7 @@ namespace MyCodingTracker
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
+                connection.Open();
                 string sql = @$"DELETE FROM MyCodingTracker
                                             WHERE Date = '{date}'";
                 connection.Execute(sql);
@@ -47,6 +49,7 @@ namespace MyCodingTracker
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
+                connection.Open();
                 using (var command = connection.CreateCommand())
                 {
                     if (startTime is null && endTime is null)
@@ -77,28 +80,63 @@ namespace MyCodingTracker
 
             using (var connection = new SqliteConnection(_connectionString))
             {
-                using (var command = new SqliteCommand("SELECT * FROM MyCodingTracker", connection))
-                using (var reader = command.ExecuteReader()) 
+                connection.Open();
+
+                string sqlQuery = @"SELECT * FROM MyCodingTracker";
+                using (var command = new SqliteCommand(sqlQuery, connection))
+                using (var reader = command.ExecuteReader())
 
                     if (reader.HasRows)
                     {
                         while (reader.Read())
                         {
-                            var models = new Models.CodingSession();
-                            models.Date = (string)reader["Date"];
-                            models.StartTime = (string)reader["StartTime"];
-                            models.EndTime = (string)reader["EndTime"];
-                            models.Duration = (string)reader["Duration"];
+                            var model = new CodingSession
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Date = reader["Date"].ToString()!,
+                                StartTime = reader["StartTime"].ToString()!,
+                                EndTime = reader["EndTime"].ToString()!,
+                                Duration = reader["Duration"].ToString()!
+                            };
 
-                            codingSessions.Add(models);
+                            codingSessions.Add(model);
                         }
                     }
                     else
                     {
-                        AnsiConsole.MarkupLine("\n[red]ERROR - You don't have any records![/]\n");
+                        AnsiConsole.MarkupLine("[red]No records found in the database.[/]");
                     }
             }
             return codingSessions;
         }
+
+        public CodingSession? ReadSingleRecord(string date)
+        {
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                string query = "SELECT * FROM MyCodingTracker WHERE Date = @Date";
+                using (var command = new SqliteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Date", date);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new CodingSession
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Date = reader["Date"].ToString()!,
+                                StartTime = reader["StartTime"].ToString()!,
+                                EndTime = reader["EndTime"].ToString()!,
+                                Duration = reader["Duration"].ToString()!
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
+}

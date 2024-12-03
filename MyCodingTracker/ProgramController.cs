@@ -33,7 +33,7 @@ namespace MyCodingTracker
                 switch (menuPrompt)
                 {
                     case "View all tracked sessions":
-                        DisplayInTable();
+                        ViewAllRecords();
                         break;
                     case "Start a new session record":
                         GetRecordsToInsert();
@@ -69,7 +69,7 @@ namespace MyCodingTracker
 
             DbManager.InsertRecord(date, startTime, endTime, duration);
             AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved.");
-            ViewRecords();
+            ViewSingleRecord();
         }
 
         private static void DisplayUpdateContextMenu()
@@ -77,7 +77,7 @@ namespace MyCodingTracker
             var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
                 .Title("[green]Select the type of Data you want to change.[/][/]")
                 .PageSize(5)
-                .AddChoices<string>(new[]
+                .AddChoices(new[]
                 {
                     "Update Date",
                     "Update Start and End Time",
@@ -96,36 +96,36 @@ namespace MyCodingTracker
         private static void SelectRecordToUpdate(string updateChoice)
         {
             AnsiConsole.Clear();
-            DisplayInTable();
+            ViewAllRecords();
 
             string oldDate = Input.GetDate();
             DisplayUpdateContextMenu();
 
-                switch (updateChoice)
-                {
-                    case "Update Date":
-                        string newDate = Input.GetDate();
-                        DbManager.UpdateRecord(oldDate, newDate, null, null, null);
-                        break;
-                    case "Update Start and End Time":
-                        string startTime = Input.GetStartTime();
-                        string endTime = Input.GetEndTime();
-                        string duration = Input.GetDuration();
-                        DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
-                        break;
-                    case "Update All Attributes":
-                        newDate = Input.GetDate();
-                        startTime = Input.GetStartTime();
-                        endTime = Input.GetEndTime();
-                        duration = Input.GetDuration();
-                        DbManager.UpdateRecord(oldDate, newDate, startTime, endTime, duration);
-                        break;
-                    default:
-                        AnsiConsole.MarkupLine("[red]Invalid selection. Returning to the main menu.[/]");
-                        break;
-                }
-                AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
-                DisplayInTable();
+            switch (updateChoice)
+            {
+                case "Update Date":
+                    string newDate = Input.GetDate();
+                    DbManager.UpdateRecord(oldDate, newDate, null, null, null);
+                    break;
+                case "Update Start and End Time":
+                    string startTime = Input.GetStartTime();
+                    string endTime = Input.GetEndTime();
+                    string duration = Input.GetDuration();
+                    DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
+                    break;
+                case "Update All Attributes":
+                    newDate = Input.GetDate();
+                    startTime = Input.GetStartTime();
+                    endTime = Input.GetEndTime();
+                    duration = Input.GetDuration();
+                    DbManager.UpdateRecord(oldDate, newDate, startTime, endTime, duration);
+                    break;
+                default:
+                    AnsiConsole.MarkupLine("[red]Invalid selection. Returning to the main menu.[/]");
+                    break;
+            }
+            AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
+            ViewAllRecords();
         }
 
         private static void DeleteContextMenu()
@@ -135,7 +135,7 @@ namespace MyCodingTracker
             if (confirmation)
             {
                 Console.Clear();
-                ViewRecords();
+                ViewSingleRecord();
 
                 string dateToDelete = Input.GetDate();
                 DbManager.DeleteRecord(dateToDelete);
@@ -148,37 +148,67 @@ namespace MyCodingTracker
             }
         }
 
-        private static void ViewRecords()
+        private static void ViewSingleRecord()
         {
-            throw new NotImplementedException();
-        }
+            AnsiConsole.Clear();
 
-        public static void DisplayInTable()
-        {
-            var sessions = DbManager.ReadFromDb();
-            if (!sessions.Any())
+            string date = UserInput.GetDate();
+
+            var record = DbManager.ReadSingleRecord(date);
+            if (record == null)
             {
-                AnsiConsole.MarkupLine("[red]No records found![/]");
+                AnsiConsole.MarkupLine($"[red]No record found for {date}![/]");
                 return;
             }
-            var table = new Table()
-               .Border(TableBorder.Rounded)
-               .BorderColor(Color.Blue)
-               .Title("[yellow bold]Your tracked coding sessions[/]");
-            var type = typeof(string);
-            var properties = type.GetProperties();
 
-            foreach (var property in properties)
+            var table = new Table();
+            table.AddColumn("Id");
+            table.AddColumn("Date");
+            table.AddColumn("Start Time");
+            table.AddColumn("End Time");
+            table.AddColumn("Duration");
+
+            table.AddRow(
+                record.Id.ToString(),
+                record.Date,
+                record.StartTime,
+                record.EndTime,
+                record.Duration
+            );
+            AnsiConsole.Write(table);
+        }
+    
+        public static void ViewAllRecords()
+        {
+            AnsiConsole.Clear();
+
+            var records = DbManager.ReadFromDb();
+            if (records == null || records.Count == 0)
             {
-                table.AddColumn(property.Name);
+                AnsiConsole.MarkupLine("[red]No records found in the database.[/]");
+                return;
             }
 
-            foreach (var dataItem in data)
+            var table = new Table();
+            table.AddColumn("Id");
+            table.AddColumn("Date");
+            table.AddColumn("Start Time");
+            table.AddColumn("End Time");
+            table.AddColumn("Duration");
+
+            foreach (var record in records)
             {
-                table.AddRow(properties.Select(p => p.GetValue(dataItem)?.ToString() ?? string.Empty).ToArray());
+                table.AddRow(
+                record.Id.ToString(),
+                record.Date.ToString(),
+                record.StartTime.ToString(),
+                record.EndTime.ToString(),
+                record.Duration.ToString()
+                );
             }
 
-            AnsiConsole.Write(table.Expand());
+            AnsiConsole.Write(table.Expand);
         }
-        }
+
+    }
 }
