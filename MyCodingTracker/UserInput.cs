@@ -5,7 +5,6 @@ namespace MyCodingTracker
 {
     internal class UserInput
     {
-        // readonly Validation valid = new();
         private string? Date { get; set; } = string.Empty;
         private string? StartTime { get; set; } = string.Empty;
         private string? EndTime { get; set; } = string.Empty;
