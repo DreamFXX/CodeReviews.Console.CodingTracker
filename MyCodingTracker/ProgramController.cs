@@ -1,6 +1,5 @@
 ﻿using MyCodingTracker.Models;
 using Spectre.Console;
-using System.Reflection;
 
 namespace MyCodingTracker
 {
@@ -43,6 +42,9 @@ namespace MyCodingTracker
                         break;
                     case "Delete coding session":
                         DeleteContextMenu();
+                        break;
+                    case "":
+                        return;
                         break;
                     default:
                         AnsiConsole.MarkupLine("[red]Invalid selection![/]");
@@ -152,7 +154,7 @@ namespace MyCodingTracker
         {
             AnsiConsole.Clear();
 
-            string date = UserInput.GetDate();
+            string date = Input.GetDate();
 
             var record = DbManager.ReadSingleRecord(date);
             if (record == null)
