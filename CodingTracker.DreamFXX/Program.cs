@@ -1,8 +1,8 @@
-﻿namespace MyCodingTracker
+﻿namespace CodingTracker.DreamFXX
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             ProgramController.StartProgram();
         }

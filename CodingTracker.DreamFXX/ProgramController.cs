@@ -1,6 +1,6 @@
 ﻿using Spectre.Console;
 
-namespace MyCodingTracker
+namespace CodingTracker.DreamFXX
 {
     public static class ProgramController
     {
@@ -45,7 +45,7 @@ namespace MyCodingTracker
 
         internal static string MainMenu()
         {
-            return 
+            return
                 AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                 .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
@@ -88,7 +88,7 @@ namespace MyCodingTracker
                     "Go Back to Main Menu"
                 }));
 
-           SelectRecordToUpdate(updateChoice);
+            SelectRecordToUpdate(updateChoice);
         }
 
         private static void SelectRecordToUpdate(string updateChoice)
@@ -180,7 +180,7 @@ namespace MyCodingTracker
             );
             AnsiConsole.Write(table);
         }
-    
+
         public static void ViewAllRecords()
         {
             AnsiConsole.Clear();

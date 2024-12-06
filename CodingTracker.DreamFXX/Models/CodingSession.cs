@@ -1,15 +1,15 @@
-﻿namespace MyCodingTracker.Models
+﻿namespace CodingTracker.DreamFXX.Models
 {
     public class CodingSession
     {
         public int Id { get; set; }
 
-        public string Date { get; set; } = String.Empty;
+        public string Date { get; set; } = string.Empty;
 
-        public string StartTime { get; set; } = String.Empty;
+        public string StartTime { get; set; } = string.Empty;
 
-        public string EndTime { get; set; } = String.Empty;
+        public string EndTime { get; set; } = string.Empty;
 
-        public string Duration { get; set; } = String.Empty;
+        public string Duration { get; set; } = string.Empty;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Spectre.Console;
 using System.Globalization;
 
-namespace MyCodingTracker
+namespace CodingTracker.DreamFXX
 {
     internal class UserInput
     {
@@ -13,7 +13,7 @@ namespace MyCodingTracker
         public string GetDate()
         {
             Date = AnsiConsole.Ask<string>(
-                ("[yellow]Please, enter the date of your session. Specify date in this exact format![/]\n-[green](dd-MM-yy)[/] -> "));
+                "[yellow]Please, enter the date of your session. Specify date in this exact format![/]\n-[green](dd-MM-yy)[/] -> ");
             while (!_dateTimeValidation.IsValidDate(Date))
             {
                 AnsiConsole.MarkupLine("Invalid date! Expected format (mm-dd-yy)");

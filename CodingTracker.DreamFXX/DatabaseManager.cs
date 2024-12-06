@@ -1,13 +1,15 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Spectre.Console;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Data.Sqlite;
 using Dapper;
-using MyCodingTracker.Models;
-using Spectre.Console;
+using CodingTracker.DreamFXX.Models;
 
-namespace MyCodingTracker
+
+namespace CodingTracker.DreamFXX
 {
     internal class DatabaseManager
     {
-        private readonly string? _connectionString = ConfigurationManager.AppSettings.Get("connectionString");
+        private readonly string? _connectionString = new ConfigurationManager().GetConnectionString("connectionString");
 
         public void CreateDatabase()
         {
@@ -49,7 +51,6 @@ namespace MyCodingTracker
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
-                using (var command = connection.CreateCommand())
                 {
                     if (startTime is null && endTime is null)
                     {
