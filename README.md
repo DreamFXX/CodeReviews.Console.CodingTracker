@@ -9,11 +9,7 @@ My second C# application with CRUD operations.
 
 - Developed using C#, Dapper, SQLite and Spectre.Console.
 
-# For right app start, add system.configuration; !! i removed it because of codacy issues.
+### For right app start, add system.configuration; !! i removed it because of codacy issues.
 
-### Todos
-- Make validation class file and finish all places that needs to be validated.
-- Write what i experienced and learned throughout finishing this project.
-- Create better and cleaner structure and hierarchy of classes and methods.
 
-Updated 3.12.2024
+Updated 7.12.2024
