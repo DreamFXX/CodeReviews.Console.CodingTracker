@@ -1,5 +1,4 @@
 ﻿using Spectre.Console;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
@@ -9,7 +8,7 @@ namespace CodingTracker.DreamFXX
 {
     internal class DatabaseManager
     {
-        private readonly string? _connectionString = new ConfigurationManager().GetConnectionString("connectionString");
+        private readonly string? _connectionString = ConfigurationManager.AppSettings.Get("connectionString");
 
         public void CreateDatabase()
         {
@@ -51,7 +50,7 @@ namespace CodingTracker.DreamFXX
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
-                {
+                
                     if (startTime is null && endTime is null)
                     {
                         connection.Execute($@"UPDATE MyCodingTracker
@@ -70,7 +69,6 @@ namespace CodingTracker.DreamFXX
                                                SET Date = '{newDate}', StartTime = '{startTime}', EndTime = '{endTime}', Duration = '{duration}'
                                                WHERE Date = '{oldDate}'");
                     }
-                }
             }
         }
 

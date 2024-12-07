@@ -12,41 +12,41 @@ namespace CodingTracker.DreamFXX
 
         public string GetDate()
         {
-            Date = AnsiConsole.Ask<string>(
+            this.Date = AnsiConsole.Ask<string>(
                 "[yellow]Please, enter the date of your session. Specify date in this exact format![/]\n-[green](dd-MM-yy)[/] -> ");
-            while (!_dateTimeValidation.IsValidDate(Date))
+            while (!_dateTimeValidation.IsValidDate(this.Date))
             {
                 AnsiConsole.MarkupLine("Invalid date! Expected format (mm-dd-yy)");
-                Date = Console.ReadLine();
+                this.Date = Console.ReadLine();
             }
-            return Date;
+            return this.Date;
         }
 
         public string GetStartTime()
         {
-            StartTime = AnsiConsole.Ask<string>
+            this.StartTime = AnsiConsole.Ask<string>
                 ("[yellow]Enter the time your session started. Specify time in this format![/]\n-[green](hh:mm)[/] -> ");
 
-            while (!_dateTimeValidation.IsValidStartTime(StartTime))
+            while (!_dateTimeValidation.IsValidStartTime(this.StartTime))
             {
                 AnsiConsole.MarkupLine("[red]Invalid time! Time must be in this format - (hh:mm):[/] ");
-                StartTime = Console.ReadLine();
+                this.StartTime = Console.ReadLine();
             }
 
-            return StartTime;
+            return this.StartTime;
         }
 
         public string GetEndTime()
         {
-            EndTime = AnsiConsole.Ask<string>
+            this.EndTime = AnsiConsole.Ask<string>
                 ("[yellow]Enter the time your session ended. Specify time in this format![/]\n-[green](hh:mm)[/] -> ");
-            while (_dateTimeValidation.IsValidStartTime(EndTime))
+            while (!_dateTimeValidation.IsValidStartTime(this.EndTime))
             {
                 AnsiConsole.MarkupLine("[red]Invalid time! Time must be in this format - (hh:mm):[/] ");
-                EndTime = Console.ReadLine();
+                this.EndTime = Console.ReadLine();
             }
 
-            return EndTime;
+            return this.EndTime;
         }
 
         public string GetDuration()

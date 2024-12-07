@@ -186,7 +186,7 @@ namespace CodingTracker.DreamFXX
             AnsiConsole.Clear();
 
             var records = DbManager.ReadFromDb();
-            if (records == null || records.Count == 0)
+            if (records.Count == 0)
             {
                 AnsiConsole.MarkupLine("[red]No records found in the database.[/]");
                 return;
