@@ -64,9 +64,9 @@ namespace CodingTracker.DreamFXX
         {
             AnsiConsole.Clear();
 
-            string date = Input.GetDate();
-            string startTime = Input.GetStartTime();
-            string endTime = Input.GetEndTime();
+            string? date = Input.GetDate();
+            string? startTime = Input.GetStartTime();
+            string? endTime = Input.GetEndTime();
             string duration = Input.GetDuration();
 
             DbManager.InsertRecord(date, startTime, endTime, duration);
@@ -96,17 +96,17 @@ namespace CodingTracker.DreamFXX
             AnsiConsole.Clear();
             ViewAllRecords();
 
-            string oldDate = Input.GetDate();
+            string? oldDate = Input.GetDate();
 
             switch (updateChoice)
             {
                 case "Update Date":
-                    string newDate = Input.GetDate();
+                    string? newDate = Input.GetDate();
                     DbManager.UpdateRecord(oldDate, newDate, null, null, null);
                     break;
                 case "Update Start and End Time":
-                    string startTime = Input.GetStartTime();
-                    string endTime = Input.GetEndTime();
+                    string? startTime = Input.GetStartTime();
+                    string? endTime = Input.GetEndTime();
                     string duration = Input.GetDuration();
                     DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
                     break;
@@ -133,7 +133,7 @@ namespace CodingTracker.DreamFXX
             if (confirmation)
             {
                 Console.Clear();
-                string dateToDelete = Input.GetDate();
+                string? dateToDelete = Input.GetDate();
                 var record = DbManager.ReadSingleRecord(dateToDelete);
                 if (record != null)
                 {
@@ -149,36 +149,6 @@ namespace CodingTracker.DreamFXX
             {
                 AnsiConsole.MarkupLine("[red]Deleting was cancelled.[/]");
             }
-        }
-
-        private static void ViewSingleRecord()
-        {
-            AnsiConsole.Clear();
-
-            string date = Input.GetDate();
-
-            var record = DbManager.ReadSingleRecord(date);
-            if (record == null)
-            {
-                AnsiConsole.MarkupLine($"[red]No record found for {date}![/]");
-                return;
-            }
-
-            var table = new Table();
-            table.AddColumn("Id");
-            table.AddColumn("Date");
-            table.AddColumn("Start Time");
-            table.AddColumn("End Time");
-            table.AddColumn("Duration");
-
-            table.AddRow(
-                record.Id.ToString(),
-                record.Date,
-                record.StartTime,
-                record.EndTime,
-                record.Duration
-            );
-            AnsiConsole.Write(table);
         }
 
         public static void ViewAllRecords()
@@ -203,10 +173,10 @@ namespace CodingTracker.DreamFXX
             {
                 table.AddRow(
                 record.Id.ToString(),
-                record.Date.ToString(),
-                record.StartTime.ToString(),
-                record.EndTime.ToString(),
-                record.Duration.ToString()
+                record.Date,
+                record.StartTime,
+                record.EndTime,
+                record.Duration
                 );
             }
 

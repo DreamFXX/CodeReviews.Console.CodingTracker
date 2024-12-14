@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.Configuration;
+using Spectre.Console;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
@@ -6,9 +7,9 @@ using CodingTracker.DreamFXX.Models;
 
 namespace CodingTracker.DreamFXX
 {
-    internal class DatabaseManager
+    public class DatabaseManager
     {
-        private readonly string? _connectionString = ConfigurationManager.AppSettings.Get("connectionString");
+        private readonly string? _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
         public void CreateDatabase()
         {
@@ -24,7 +25,7 @@ namespace CodingTracker.DreamFXX
             }
         }
 
-        public void InsertRecord(string date, string startTime, string endTime, string duration)
+        public void InsertRecord(string? date, string? startTime, string? endTime, string duration)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
@@ -34,7 +35,7 @@ namespace CodingTracker.DreamFXX
             }
         }
 
-        public void DeleteRecord(string date)
+        public void DeleteRecord(string? date)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
@@ -45,7 +46,7 @@ namespace CodingTracker.DreamFXX
             }
         }
 
-        public void UpdateRecord(string oldDate, string? newDate, string? startTime, string? endTime, string? duration)
+        public void UpdateRecord(string? oldDate, string? newDate, string? startTime, string? endTime, string? duration)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
@@ -108,7 +109,7 @@ namespace CodingTracker.DreamFXX
             return codingSessions;
         }
 
-        public CodingSession? ReadSingleRecord(string date)
+        public CodingSession? ReadSingleRecord(string? date)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {

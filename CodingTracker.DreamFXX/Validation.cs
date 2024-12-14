@@ -12,7 +12,7 @@ namespace CodingTracker.DreamFXX
             return DateOnly.TryParseExact(date, "dd-MM-yy", out DateOnly Date);
         }
 
-        public bool IsValidStartTime(string startTime)
+        public bool IsValidStartTime(string? startTime)
         {
             return TimeOnly.TryParseExact(startTime, "HH:mm", null, DateTimeStyles.None, out _startTime);
         }
