@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using Spectre.Console;
+﻿using Spectre.Console;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
@@ -9,7 +8,7 @@ namespace CodingTracker.DreamFXX
 {
     public class DatabaseManager
     {
-        private readonly string? _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+        private readonly string? _connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
         public void CreateDatabase()
         {
