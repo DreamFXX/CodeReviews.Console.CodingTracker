@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using Spectre.Console;
+﻿using Spectre.Console;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
