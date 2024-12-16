@@ -51,23 +51,16 @@ namespace CodingTracker.DreamFXX
 
         public string GetDuration()
         {
-            if (StartTime != null)
-            {
-                DateTime parsedStartTime = DateTime.ParseExact(StartTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None);
-                if (EndTime != null)
-                {
-                    DateTime parsedEndTime = DateTime.ParseExact(EndTime, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None);
+            DateTime parsedStartTime = DateTime.ParseExact(StartTime, "HH:mm", null, DateTimeStyles.None);
+            DateTime parsedEndTime = DateTime.ParseExact(EndTime, "HH:mm", null, DateTimeStyles.None);
+            TimeSpan duration = parsedEndTime.Subtract(parsedStartTime);
 
-                    TimeSpan duration = parsedEndTime.Subtract(parsedStartTime);
-                    if (duration < TimeSpan.Zero)
-                    {
-                        duration += TimeSpan.FromDays(1);
-                    }
-                    return duration.ToString();
-                }
+            if (duration < TimeSpan.Zero)
+            {
+                duration += TimeSpan.FromDays(1);
             }
 
-            return GetDuration();
+            return duration.ToString();
         }
     }
 }
