@@ -2,6 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace CodingTracker.DreamFXX
@@ -29,18 +30,26 @@ namespace CodingTracker.DreamFXX
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
-                connection.Execute(@$"INSERT INTO MyCodingTracker (Date, StartTime, EndTime, Duration)
-                                       VALUES('{date}', '{startTime}', '{endTime}', '{duration}')");
+                var parameters = new[]
+                {
+                    new SqliteParameter("@date", date),
+                    new SqliteParameter("@startTime", startTime),
+                    new SqliteParameter("@endTime", endTime),
+                    new SqliteParameter("@duration", duration)
+                };
+                connection.Execute(@"INSERT INTO MyCodingTracker (Date, StartTime, EndTime, Duration)
+                                       VALUES(@date, @startTime, @endTime, @duration)");
             }
         }
 
         public void DeleteRecord(string? date)
         {
+            var parameter = new SqliteParameter("@date", date);
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
                 string sql = @$"DELETE FROM MyCodingTracker
-                                            WHERE Date = '{date}'";
+                                            WHERE Date = @date";
                 connection.Execute(sql);
             }
         }
@@ -50,25 +59,33 @@ namespace CodingTracker.DreamFXX
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
-                
-                    if (startTime is null && endTime is null)
-                    {
-                        connection.Execute($@"UPDATE MyCodingTracker
-                                                SET Date = '{newDate}'
-                                                WHERE Date = '{oldDate}'");
-                    }
-                    else if (newDate is null)
-                    {
-                        connection.Execute($@"UPDATE MyCodingTracker
-                                                SET StartTime = '{startTime}', EndTime = '{endTime}', Duration = '{duration}'
-                                                WHERE Date = '{oldDate}'");
-                    }
-                    else
-                    {
-                        connection.Execute($@"UPDATE MyCodingTracker
-                                               SET Date = '{newDate}', StartTime = '{startTime}', EndTime = '{endTime}', Duration = '{duration}'
-                                               WHERE Date = '{oldDate}'");
-                    }
+                var parameters = new[]
+                {
+                    new SqliteParameter("@date", oldDate),
+                    new SqliteParameter("@newDate", newDate),
+                    new SqliteParameter("@startTime", startTime),
+                    new SqliteParameter("@endTime", endTime),
+                    new SqliteParameter("@duration", duration)
+                };
+
+                if (startTime is null && endTime is null)
+                {
+                    connection.Execute(@"UPDATE MyCodingTracker
+                                             SET Date = @newDate
+                                             WHERE Date = @oldDate");
+                }
+                else if (newDate is null)
+                {
+                    connection.Execute(@"UPDATE MyCodingTracker
+                                             SET StartTime = @startTime, EndTime = @endTime, Duration = @duration
+                                             WHERE Date = @oldDate");
+                }
+                else
+                {
+                    connection.Execute(@"UPDATE MyCodingTracker
+                                              SET Date = @newDate, StartTime = @startTime, EndTime = @endTime, Duration = @duration
+                                              WHERE Date = @oldDate");
+                }
             }
         }
 
@@ -134,6 +151,7 @@ namespace CodingTracker.DreamFXX
                     }
                 }
             }
+
             return null;
         }
     }
