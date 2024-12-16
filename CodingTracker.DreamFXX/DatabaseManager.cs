@@ -2,8 +2,6 @@
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 
 namespace CodingTracker.DreamFXX
 {
@@ -68,13 +66,13 @@ namespace CodingTracker.DreamFXX
                     new SqliteParameter("@duration", duration)
                 };
 
-                if (startTime is null && endTime is null)
+                if (@startTime is null && @endTime is null)
                 {
                     connection.Execute(@"UPDATE MyCodingTracker
                                              SET Date = @newDate
                                              WHERE Date = @oldDate");
                 }
-                else if (newDate is null)
+                else if (@newDate is null)
                 {
                     connection.Execute(@"UPDATE MyCodingTracker
                                              SET StartTime = @startTime, EndTime = @endTime, Duration = @duration
@@ -93,64 +91,52 @@ namespace CodingTracker.DreamFXX
         {
             List<CodingSession> codingSessions = new();
 
-            using (var connection = new SqliteConnection(_connectionString))
+            var connection = new SqliteConnection(_connectionString);
+            var sqlQuery = @"SELECT * FROM MyCodingTracker";
+
+            using (var command = new SqliteCommand(sqlQuery, connection))
+            using (var reader = command.ExecuteReader())
+
             {
-                connection.Open();
-
-                string sqlQuery = @"SELECT * FROM MyCodingTracker";
-                using (var command = new SqliteCommand(sqlQuery, connection))
-                using (var reader = command.ExecuteReader())
-
-                    if (reader.HasRows)
+                if (reader.HasRows)
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        var model = new CodingSession
                         {
-                            var model = new CodingSession
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Date = reader["Date"].ToString()!,
-                                StartTime = reader["StartTime"].ToString()!,
-                                EndTime = reader["EndTime"].ToString()!,
-                                Duration = reader["Duration"].ToString()!
-                            };
+                            Id = Convert.ToInt32(reader["Id"]),
+                            Date = reader["Date"].ToString()!,
+                            StartTime = reader["StartTime"].ToString()!,
+                            EndTime = reader["EndTime"].ToString()!,
+                            Duration = reader["Duration"].ToString()!
+                        };
 
-                            codingSessions.Add(model);
-                        }
+                        codingSessions.Add(model);
                     }
-                    else
-                    {
-                        AnsiConsole.MarkupLine("[red]No records found in the database.[/]");
-                    }
+                else
+                    AnsiConsole.MarkupLine("[red]No records found in the database.[/]");
             }
             return codingSessions;
         }
 
         public CodingSession? ReadSingleRecord(int id)
         {
-            using (var connection = new SqliteConnection(_connectionString))
-            {
-                connection.Open();
-                string query = "SELECT * FROM MyCodingTracker WHERE Id = @Id";
-                using (var command = new SqliteCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Id", id);
+            var connection = new SqliteConnection(_connectionString);
+            var query = "SELECT * FROM MyCodingTracker WHERE Id = @Id";
+            SqliteParameter parameter = new SqliteParameter("@Id", id);
 
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return new CodingSession
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Date = reader["Date"].ToString()!,
-                                StartTime = reader["StartTime"].ToString()!,
-                                EndTime = reader["EndTime"].ToString()!,
-                                Duration = reader["Duration"].ToString()!
-                            };
-                        }
-                    }
-                }
-            }
+            using var command = new SqliteCommand(query, connection);
+            using var reader = command.ExecuteReader();
+            
+            if (reader.Read())
+                return new CodingSession
+                {
+                    Id = Convert.ToInt32(reader["Id"]),
+                    Date = reader["Date"].ToString()!,
+                    StartTime = reader["StartTime"].ToString()!,
+                    EndTime = reader["EndTime"].ToString()!,
+                    Duration = reader["Duration"].ToString()!
+                };
+            
 
             return null;
         }
