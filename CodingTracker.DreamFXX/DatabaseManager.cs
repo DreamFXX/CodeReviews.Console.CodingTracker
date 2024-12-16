@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.Configuration;
+using Spectre.Console;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
@@ -7,7 +8,7 @@ namespace CodingTracker.DreamFXX
 {
     public class DatabaseManager
     {
-        private readonly string? _connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+        private readonly string? _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
         public void CreateDatabase()
         {
@@ -42,9 +43,9 @@ namespace CodingTracker.DreamFXX
 
         public void DeleteRecord(string? date)
         {
-            var parameter = new SqliteParameter("@date", date);
             using (var connection = new SqliteConnection(_connectionString))
             {
+                var parameter = new SqliteParameter("@date", date);
                 connection.Open();
                 string sql = @$"DELETE FROM MyCodingTracker
                                             WHERE Date = @date";
@@ -92,9 +93,11 @@ namespace CodingTracker.DreamFXX
             List<CodingSession> codingSessions = new();
 
             var connection = new SqliteConnection(_connectionString);
-            var sqlQuery = @"SELECT * FROM MyCodingTracker";
+            connection.Open();
 
-            using (var command = new SqliteCommand(sqlQuery, connection))
+            var sqlQuery = "SELECT * FROM MyCodingTracker";
+
+            using (var command = new SqliteCommand(sqlQuery, connection)) 
             using (var reader = command.ExecuteReader())
 
             {
@@ -118,11 +121,11 @@ namespace CodingTracker.DreamFXX
             return codingSessions;
         }
 
-        public CodingSession? ReadSingleRecord(int id)
+        public CodingSession? ReadSingleRecord(string? date)
         {
             var connection = new SqliteConnection(_connectionString);
-            var query = "SELECT * FROM MyCodingTracker WHERE Id = @Id";
-            SqliteParameter parameter = new SqliteParameter("@Id", id);
+            var query = "SELECT * FROM MyCodingTracker WHERE Date = @date";
+            SqliteParameter parameter = new SqliteParameter("@date", date);
 
             using var command = new SqliteCommand(query, connection);
             using var reader = command.ExecuteReader();
