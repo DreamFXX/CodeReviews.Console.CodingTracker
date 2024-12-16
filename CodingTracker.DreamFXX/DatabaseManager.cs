@@ -125,15 +125,15 @@ namespace CodingTracker.DreamFXX
             return codingSessions;
         }
 
-        public CodingSession? ReadSingleRecord(string? date)
+        public CodingSession? ReadSingleRecord(int id)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
-                string query = "SELECT * FROM MyCodingTracker WHERE Date = @Date";
+                string query = "SELECT * FROM MyCodingTracker WHERE Id = @Id";
                 using (var command = new SqliteCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Date", date);
+                    command.Parameters.AddWithValue("@Id", id);
 
                     using (var reader = command.ExecuteReader())
                     {
