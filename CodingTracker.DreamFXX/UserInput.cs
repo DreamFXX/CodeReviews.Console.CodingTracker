@@ -6,13 +6,13 @@ namespace CodingTracker.DreamFXX
     internal class UserInput
     {
         readonly Validation _dateTimeValidation = new();
-        private string? Date { get; set; } = string.Empty;
-        private string? StartTime { get; set; } = string.Empty;
-        private string? EndTime { get; set; } = string.Empty;
+        public string? Date { get; set; } = string.Empty;
+        public string? StartTime { get; set; } = string.Empty;
+        public string? EndTime { get; set; } = string.Empty;
 
         public string? GetDate()
         {
-            this.Date = AnsiConsole.Ask<string>(
+            Date = AnsiConsole.Ask<string>(
                 "[yellow]Please, enter the date of your session. Specify date in this exact format![/]\n-[green](dd-MM-yy)[/] -> ");
             while (Date != null && !_dateTimeValidation.IsValidDate(Date))
             {
@@ -24,29 +24,29 @@ namespace CodingTracker.DreamFXX
 
         public string? GetStartTime()
         {
-            this.StartTime = AnsiConsole.Ask<string>
+            StartTime = AnsiConsole.Ask<string>
                 ("[yellow]Enter the time your session started. Specify time in this format![/]\n-[green](hh:mm)[/] -> ");
 
-            while (!_dateTimeValidation.IsValidStartTime(this.StartTime))
+            while (!_dateTimeValidation.IsValidStartTime(StartTime))
             {
                 AnsiConsole.MarkupLine("[red]Invalid time! Time must be in this format - (hh:mm):[/] ");
-                this.StartTime = Console.ReadLine();
+                StartTime = Console.ReadLine();
             }
 
-            return this.StartTime;
+            return StartTime;
         }
 
         public string? GetEndTime()
         {
-            this.EndTime = AnsiConsole.Ask<string>
+            EndTime = AnsiConsole.Ask<string>
                 ("[yellow]Enter the time your session ended. Specify time in this format![/]\n-[green](hh:mm)[/] -> ");
-            while (!_dateTimeValidation.IsValidStartTime(this.EndTime))
+            while (!_dateTimeValidation.IsValidStartTime(EndTime))
             {
                 AnsiConsole.MarkupLine("[red]Invalid time! Time must be in this format - (hh:mm):[/] ");
-                this.EndTime = Console.ReadLine();
+                EndTime = Console.ReadLine();
             }
 
-            return this.EndTime;
+            return EndTime;
         }
 
         public string GetDuration()

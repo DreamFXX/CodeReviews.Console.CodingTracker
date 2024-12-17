@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.Configuration;
+using Spectre.Console;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using CodingTracker.DreamFXX.Models;
@@ -25,6 +26,10 @@ namespace CodingTracker.DreamFXX
 
         public void InsertRecord(string? date, string? startTime, string? endTime, string duration)
         {
+            if (string.IsNullOrEmpty(date) || string.IsNullOrEmpty(startTime) || string.IsNullOrEmpty(endTime) || string.IsNullOrEmpty(duration))
+            {
+                throw new ArgumentException("You enter none or not valid information about a session_ ");
+            }
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
@@ -36,7 +41,7 @@ namespace CodingTracker.DreamFXX
                     new SqliteParameter("@duration", duration)
                 };
                 connection.Execute(@"INSERT INTO MyCodingTracker (Date, StartTime, EndTime, Duration)
-                                       VALUES(@date, @startTime, @endTime, @duration)");
+                                       VALUES(@date, @startTime, @endTime, @duration)", parameters);
             }
         }
 
