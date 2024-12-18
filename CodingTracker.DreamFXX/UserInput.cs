@@ -61,8 +61,9 @@ internal class UserInput
         return duration.ToString();
     }
 
-    public int GetId()
+    public string GetId()
     {
-        throw new NotImplementedException();
+        Console.Clear();
+        return AnsiConsole.Ask<string>("Please enter ID: ");
     }
 }
