@@ -1,10 +1,9 @@
-﻿namespace CodingTracker.DreamFXX
+﻿namespace CodingTracker.DreamFXX;
+
+internal class Program
 {
-    internal class Program
+    private static void Main()
     {
-        static void Main()
-        {
-            ProgramController.StartProgram();
-        }
+        ProgramController.StartProgram();
     }
 }

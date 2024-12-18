@@ -1,188 +1,174 @@
 ﻿using Spectre.Console;
 
-namespace CodingTracker.DreamFXX
+namespace CodingTracker.DreamFXX;
+
+public static class ProgramController
 {
-    public static class ProgramController
+    private static readonly DatabaseManager DbManager = new();
+    private static readonly UserInput Input = new();
+
+    public static void StartProgram()
     {
-        private static readonly DatabaseManager DbManager = new();
-        private static readonly UserInput Input = new();
+        DbManager.CreateDatabase();
 
-        public static void StartProgram()
+        var running = true;
+        while (running)
         {
-            DbManager.CreateDatabase();
+            var menuPrompt = MainMenu();
 
-            bool running = true;
-            while (running)
+            switch (menuPrompt)
             {
-                string menuPrompt = MainMenu();
-
-                switch (menuPrompt)
-                {
-                    case "View all tracked sessions":
-                        ViewAllRecords();
-                        break;
-                    case "Start a new session record":
-                        GetRecordsToInsert();
-                        break;
-                    case "Change an existing session data":
-                        DisplayUpdateContextMenu();
-                        break;
-                    case "Delete coding session":
-                        DeleteContextMenu();
-                        break;
-                    case "Close application":
-                        running = false;
-                        break;
-                    default:
-                        AnsiConsole.MarkupLine("[red]Invalid selection! Press any key to go back to the menu.[/]");
-                        Console.ReadKey();
-                        break;
-                }
-            }
-            AnsiConsole.MarkupLine("[green]Thank you for using Coding Time Tracker![/]");
-            Console.ReadKey();
-        }
-
-        static string MainMenu()
-        {
-            return
-                AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
-                .PageSize(10)
-                .AddChoices(new[]
-                {
-                "View all tracked sessions",
-                "Start a new session record",
-                "Change an existing session data",
-                "Delete coding session",
-                "Close application",
-                }));
-        }
-
-        private static void GetRecordsToInsert()
-        {
-            AnsiConsole.Clear();
-
-            string? date = Input.GetDate();
-            string? startTime = Input.GetStartTime();
-            string? endTime = Input.GetEndTime();
-            string duration = Input.GetDuration();
-
-            DbManager.InsertRecord(date, startTime, endTime, duration);
-
-            AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved. Press any key to return to the main menu.[/]");
-            Console.ReadKey();
-        }
-
-        private static void DisplayUpdateContextMenu()
-        {
-            var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
-                .Title("[green]Select the type of Data you want to change.[/]")
-                .PageSize(5)
-                .AddChoices(new[]
-                {
-                    "Update Date",
-                    "Update Start and End Time",
-                    "Update All Attributes",
-                    "Go Back to Main Menu"
-                }));
-
-            SelectRecordToUpdate(updateChoice);
-        }
-
-        private static void SelectRecordToUpdate(string updateChoice)
-        {
-            AnsiConsole.Clear();
-            ViewAllRecords();
-
-            string? oldDate = Input.GetDate();
-
-            switch (updateChoice)
-            {
-                case "Update Date":
-                    string? newDate = Input.GetDate();
-                    DbManager.UpdateRecord(oldDate, newDate, null, null, null);
+                case "View all tracked sessions":
+                    ViewAllRecords();
                     break;
-                case "Update Start and End Time":
-                    string? startTime = Input.GetStartTime();
-                    string? endTime = Input.GetEndTime();
-                    string duration = Input.GetDuration();
-                    DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
+                case "Start a new session record":
+                    GetRecordsToInsert();
                     break;
-                case "Update All Attributes":
-                    newDate = Input.GetDate();
-                    startTime = Input.GetStartTime();
-                    endTime = Input.GetEndTime();
-                    duration = Input.GetDuration();
-                    DbManager.UpdateRecord(oldDate, newDate, startTime, endTime, duration);
+                case "Change an existing session data":
+                    DisplayUpdateContextMenu();
+                    break;
+                case "Delete coding session":
+                    DeleteContextMenu();
+                    break;
+                case "Close application":
+                    running = false;
                     break;
                 default:
-                    AnsiConsole.MarkupLine("[red]Invalid selection. Returning to the main menu.[/]");
-                    MainMenu();
+                    AnsiConsole.MarkupLine("[red]Invalid selection! Press any key to go back to the menu.[/]");
+                    Console.ReadKey();
                     break;
             }
-            AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
-            Console.ReadKey();
         }
 
-        private static void DeleteContextMenu()
+        AnsiConsole.MarkupLine("[green]Thank you for using Coding Time Tracker![/]");
+        Console.ReadKey();
+    }
+
+    private static string MainMenu()
+    {
+        return
+            AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[yellow]Welcome in Coding Time Tracker![/]\n[underline][yellow]MAIN MENU[/][/]")
+                    .PageSize(10)
+                    .AddChoices("View all tracked sessions", "Start a new session record",
+                        "Change an existing session data", "Delete coding session", "Close application"));
+    }
+
+    private static void GetRecordsToInsert()
+    {
+        AnsiConsole.Clear();
+
+        var date = Input.GetDate();
+        var startTime = Input.GetStartTime();
+        var endTime = Input.GetEndTime();
+        var duration = Input.GetDuration();
+
+        DbManager.InsertRecord(date, startTime, endTime, duration);
+
+        AnsiConsole.MarkupLine("[yellow]Yay! Record has been saved. Press any key to return to the main menu.[/]");
+        Console.ReadKey();
+    }
+
+    private static void DisplayUpdateContextMenu()
+    {
+        var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
+            .Title("[green]Select the type of Data you want to change.[/]")
+            .PageSize(5)
+            .AddChoices("Update Date", "Update Start and End Time", "Update All Attributes", "Go Back to Main Menu"));
+
+        SelectRecordToUpdate(updateChoice);
+    }
+
+    private static void SelectRecordToUpdate(string updateChoice)
+    {
+        AnsiConsole.Clear();
+        ViewAllRecords();
+
+        var oldDate = Input.GetDate();
+
+        switch (updateChoice)
         {
-            AnsiConsole.Clear();
-            var confirmation = AnsiConsole.Confirm("[green]Do you really want to delete records?[/]");
-            if (confirmation)
+            case "Update Date":
+                var newDate = Input.GetDate();
+                DbManager.UpdateRecord(oldDate, newDate, null, null, null);
+                break;
+            case "Update Start and End Time":
+                var startTime = Input.GetStartTime();
+                var endTime = Input.GetEndTime();
+                var duration = Input.GetDuration();
+                DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
+                break;
+            case "Update All Attributes":
+                newDate = Input.GetDate();
+                startTime = Input.GetStartTime();
+                endTime = Input.GetEndTime();
+                duration = Input.GetDuration();
+                DbManager.UpdateRecord(oldDate, newDate, startTime, endTime, duration);
+                break;
+            default:
+                AnsiConsole.MarkupLine("[red]Invalid selection. Returning to the main menu.[/]");
+                MainMenu();
+                break;
+        }
+
+        AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
+        Console.ReadKey();
+    }
+
+    private static void DeleteContextMenu()
+    {
+        AnsiConsole.Clear();
+        var confirmation = AnsiConsole.Confirm("[green]Do you really want to delete records?[/]");
+        if (confirmation)
+        {
+            Console.Clear();
+            var dateToDelete = Input.GetDate();
+            var record = DbManager.ReadSingleRecord(dateToDelete);
+            if (record != null)
             {
-                Console.Clear();
-                string? dateToDelete = Input.GetDate();
-                var record = DbManager.ReadSingleRecord(dateToDelete);
-                if (record != null)
-                {
-                    DbManager.DeleteRecord(dateToDelete);
-                    AnsiConsole.MarkupLine($"[green]Record for {dateToDelete} deleted successfully![/]");
-                }
-                else
-                {
-                    AnsiConsole.MarkupLine($"[red]No record found for {dateToDelete}![/]");
-                }
+                DbManager.DeleteRecord(dateToDelete);
+                AnsiConsole.MarkupLine($"[green]Record for {dateToDelete} deleted successfully![/]");
             }
             else
             {
-                AnsiConsole.MarkupLine("[red]Deleting was cancelled.[/]");
+                AnsiConsole.MarkupLine($"[red]No record found for {dateToDelete}![/]");
             }
         }
-
-        public static void ViewAllRecords()
+        else
         {
-            AnsiConsole.Clear();
+            AnsiConsole.MarkupLine("[red]Deleting was cancelled.[/]");
+        }
+    }
 
-            var records = DbManager.ReadFromDb();
-            if (records.Count == 0)
-            {
-                AnsiConsole.MarkupLine("[red]No records found in the database.[/]");
-                return;
-            }
+    public static void ViewAllRecords()
+    {
+        AnsiConsole.Clear();
 
-            var table = new Table();
-            table.AddColumn("Id");
-            table.AddColumn("Date");
-            table.AddColumn("Start Time");
-            table.AddColumn("End Time");
-            table.AddColumn("Duration");
+        var records = DbManager.ReadFromDb();
+        if (records.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[red]No records found in the database.[/]");
+            return;
+        }
 
-            foreach (var record in records)
-            {
-                table.AddRow(
+        var table = new Table();
+        table.AddColumn("Id");
+        table.AddColumn("Date");
+        table.AddColumn("Start Time");
+        table.AddColumn("End Time");
+        table.AddColumn("Duration");
+
+        foreach (var record in records)
+            table.AddRow(
                 record.Id.ToString(),
                 record.Date,
                 record.StartTime,
                 record.EndTime,
                 record.Duration
-                );
-            }
+            );
 
-            AnsiConsole.Write(table);
-            Console.ReadKey();
-        }
-
+        AnsiConsole.Write(table);
+        Console.ReadKey();
     }
 }
