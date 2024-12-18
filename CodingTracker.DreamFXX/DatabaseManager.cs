@@ -80,14 +80,6 @@ namespace CodingTracker.DreamFXX
             }
         }
 
-        private void GetUpdateRecords()
-        {
-            
-            string? newDate = Input.GetDate();
-            string? startTime = Input.GetStartTime();
-            string? endTime = Input.GetEndTime();
-            string duration = Input.GetDuration();
-        }
         public List<CodingSession> ReadFromDb()
         {
             List<CodingSession> codingSessions = new();
@@ -124,8 +116,8 @@ namespace CodingTracker.DreamFXX
         public CodingSession? ReadSingleRecord(string? date)
         {
             var connection = new SqliteConnection(_connectionString);
-            var query = "SELECT * FROM MyCodingTracker WHERE Date = @date";
-            SqliteParameter parameter = new SqliteParameter("@date", date);
+            var query = "SELECT * FROM MyCodingTracker WHERE Date = @date", new {date};
+            
 
             using var command = new SqliteCommand(query, connection);
             using var reader = command.ExecuteReader();
