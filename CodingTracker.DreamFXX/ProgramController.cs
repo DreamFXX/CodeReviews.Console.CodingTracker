@@ -43,7 +43,7 @@ namespace CodingTracker.DreamFXX
             Console.ReadKey();
         }
 
-        internal static string MainMenu()
+        static string MainMenu()
         {
             return
                 AnsiConsole.Prompt(

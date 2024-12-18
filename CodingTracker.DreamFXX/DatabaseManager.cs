@@ -9,6 +9,7 @@ namespace CodingTracker.DreamFXX
     public class DatabaseManager
     {
         private readonly string? _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+        internal UserInput Input = new();
 
         public void CreateDatabase()
         {
@@ -26,18 +27,18 @@ namespace CodingTracker.DreamFXX
 
         public void InsertRecord(string? date, string? startTime, string? endTime, string duration)
         {
+            if (string.IsNullOrWhiteSpace(date) || string.IsNullOrWhiteSpace(startTime) || string.IsNullOrWhiteSpace(endTime))
+            {
+                throw new ArgumentException("Error - You must provide a date, start time, and end time in displayed format.");
+            }
+
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
-                var parameters = new[]
-                {
-                    new SqliteParameter("@date", date),
-                    new SqliteParameter("@startTime", startTime),
-                    new SqliteParameter("@endTime", endTime),
-                    new SqliteParameter("@duration", duration)
-                };
-                connection.Execute(@"INSERT INTO MyCodingTracker (Date, StartTime, EndTime, Duration)
-                                       VALUES(@date, @startTime, @endTime, @duration)");
+                connection.Execute(
+                    @"INSERT INTO MyCodingTracker (Date, StartTime, EndTime, Duration)
+                          VALUES (@date, @startTime, @endTime, @duration)",
+                    new {date, startTime, endTime, duration });
             }
         }
 
@@ -45,11 +46,10 @@ namespace CodingTracker.DreamFXX
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
-                var parameter = new SqliteParameter("@date", date);
                 connection.Open();
-                string sql = @$"DELETE FROM MyCodingTracker
-                                            WHERE Date = @date";
-                connection.Execute(sql);
+
+                connection.Execute(@"DELETE FROM MyCodingTracker
+                                            WHERE Date = @date", new { date });
             }
         }
 
@@ -58,36 +58,36 @@ namespace CodingTracker.DreamFXX
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
-                var parameters = new[]
-                {
-                    new SqliteParameter("@date", oldDate),
-                    new SqliteParameter("@newDate", newDate),
-                    new SqliteParameter("@startTime", startTime),
-                    new SqliteParameter("@endTime", endTime),
-                    new SqliteParameter("@duration", duration)
-                };
 
                 if (@startTime is null && @endTime is null)
                 {
                     connection.Execute(@"UPDATE MyCodingTracker
                                              SET Date = @newDate
-                                             WHERE Date = @oldDate");
+                                             WHERE Date = @oldDate", new {newDate,oldDate});
                 }
                 else if (@newDate is null)
                 {
                     connection.Execute(@"UPDATE MyCodingTracker
                                              SET StartTime = @startTime, EndTime = @endTime, Duration = @duration
-                                             WHERE Date = @oldDate");
+                                             WHERE Date = @oldDate", new {startTime, endTime, duration, oldDate});
                 }
                 else
                 {
                     connection.Execute(@"UPDATE MyCodingTracker
                                               SET Date = @newDate, StartTime = @startTime, EndTime = @endTime, Duration = @duration
-                                              WHERE Date = @oldDate");
+                                              WHERE Date = @oldDate", new {newDate, startTime, endTime, duration, oldDate});
                 }
             }
         }
 
+        private void GetUpdateRecords()
+        {
+            
+            string? newDate = Input.GetDate();
+            string? startTime = Input.GetStartTime();
+            string? endTime = Input.GetEndTime();
+            string duration = Input.GetDuration();
+        }
         public List<CodingSession> ReadFromDb()
         {
             List<CodingSession> codingSessions = new();
@@ -140,7 +140,6 @@ namespace CodingTracker.DreamFXX
                     Duration = reader["Duration"].ToString()!
                 };
             
-
             return null;
         }
     }
