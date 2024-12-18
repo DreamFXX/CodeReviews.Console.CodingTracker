@@ -72,44 +72,38 @@ public static class ProgramController
 
     private static void DisplayUpdateContextMenu()
     {
+        AnsiConsole.Clear();
+        ViewAllRecords();
+
+        var id = Input.GetId();
+
         var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
             .Title("[green]Select the type of Data you want to change.[/]")
             .PageSize(5)
             .AddChoices("Update Date", "Update Start and End Time", "Update All Attributes", "Go Back to Main Menu"));
 
-        SelectRecordToUpdate(updateChoice);
-    }
-
-    private static void SelectRecordToUpdate(string updateChoice)
-    {
-        AnsiConsole.Clear();
-        ViewAllRecords();
-
-        var oldDate = Input.GetDate();
-
         switch (updateChoice)
         {
             case "Update Date":
                 var newDate = Input.GetDate();
-                DbManager.UpdateRecord(oldDate, newDate, null, null, null);
+                DbManager.UpdateRecord(id, newDate, null, null, null);
                 break;
             case "Update Start and End Time":
                 var startTime = Input.GetStartTime();
                 var endTime = Input.GetEndTime();
                 var duration = Input.GetDuration();
-                DbManager.UpdateRecord(oldDate, null, startTime, endTime, duration);
+                DbManager.UpdateRecord(id, null, startTime, endTime, duration);
                 break;
             case "Update All Attributes":
                 newDate = Input.GetDate();
                 startTime = Input.GetStartTime();
                 endTime = Input.GetEndTime();
                 duration = Input.GetDuration();
-                DbManager.UpdateRecord(oldDate, newDate, startTime, endTime, duration);
+                DbManager.UpdateRecord(id, newDate, startTime, endTime, duration);
                 break;
             default:
                 AnsiConsole.MarkupLine("[red]Invalid selection. Returning to the main menu.[/]");
-                MainMenu();
-                break;
+                return;
         }
 
         AnsiConsole.MarkupLine("[green]Record updated successfully![/]");
@@ -122,17 +116,17 @@ public static class ProgramController
         var confirmation = AnsiConsole.Confirm("[green]Do you really want to delete records?[/]");
         if (confirmation)
         {
-            Console.Clear();
-            var dateToDelete = Input.GetDate();
-            var record = DbManager.ReadSingleRecord(dateToDelete);
+            AnsiConsole.Clear();
+            var idToDelete = Input.GetId();
+            var record = DbManager.ReadSingleRecord(idToDelete);
             if (record != null)
             {
-                DbManager.DeleteRecord(dateToDelete);
-                AnsiConsole.MarkupLine($"[green]Record for {dateToDelete} deleted successfully![/]");
+                DbManager.DeleteRecord(idToDelete);
+                AnsiConsole.MarkupLine($"[green]Record with ID {idToDelete} deleted successfully![/]");
             }
             else
             {
-                AnsiConsole.MarkupLine($"[red]No record found for {dateToDelete}![/]");
+                AnsiConsole.MarkupLine($"[red]No record found with ID {idToDelete}![/]");
             }
         }
         else

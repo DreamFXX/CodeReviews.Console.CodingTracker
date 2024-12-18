@@ -43,18 +43,18 @@ public class DatabaseManager
         }
     }
 
-    public void DeleteRecord(string? date)
+    public void DeleteRecord(int id)
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
             connection.Open();
 
             connection.Execute(@"DELETE FROM MyCodingTracker
-                                            WHERE Date = @date", new { date });
+                                            WHERE Id = @id", new { id });
         }
     }
 
-    public void UpdateRecord(string? oldDate, string? newDate, string? startTime, string? endTime, string? duration)
+    public void UpdateRecord(int id, string? newDate, string? startTime, string? endTime, string? duration)
     {
         using (var connection = new SqliteConnection(_connectionString))
         {
@@ -62,17 +62,17 @@ public class DatabaseManager
 
             if (startTime is null && endTime is null)
                 connection.Execute(@"UPDATE MyCodingTracker
-                                             SET Date = @newDate
-                                             WHERE Date = @oldDate", new { newDate, oldDate });
+                                         SET Date = @newDate
+                                         WHERE Id = @id", new { newDate, id });
             else if (newDate is null)
                 connection.Execute(@"UPDATE MyCodingTracker
-                                             SET StartTime = @startTime, EndTime = @endTime, Duration = @duration
-                                             WHERE Date = @oldDate", new { startTime, endTime, duration, oldDate });
+                                         SET StartTime = @startTime, EndTime = @endTime, Duration = @duration
+                                         WHERE Id = @id", new { startTime, endTime, duration, id });
             else
                 connection.Execute(@"UPDATE MyCodingTracker
-                                              SET Date = @newDate, StartTime = @startTime, EndTime = @endTime, Duration = @duration
-                                              WHERE Date = @oldDate",
-                    new { newDate, startTime, endTime, duration, oldDate });
+                                          SET Date = @newDate, StartTime = @startTime, EndTime = @endTime, Duration = @duration
+                                          WHERE Id = @id",
+                    new { newDate, startTime, endTime, duration, id });
         }
     }
 
@@ -84,16 +84,16 @@ public class DatabaseManager
         return codingSessions.ToList();
     }
 
-    public CodingSession? ReadSingleRecord(string? date)
+    public CodingSession? ReadSingleRecord(int id)
     {
         var connection = new SqliteConnection(_connectionString);
-        var query = "SELECT * FROM MyCodingTracker WHERE Date = @date";
+        var query = "SELECT * FROM MyCodingTracker WHERE Id = @id";
         var parameters = new
         {
-            Date = date
+            Id = id
         };
 
-        var codingSessions = connection.QuerySingle<CodingSession>(query, parameters);
+        var codingSessions = connection.QuerySingleOrDefault<CodingSession>(query, parameters);
         return codingSessions;
     }
 }

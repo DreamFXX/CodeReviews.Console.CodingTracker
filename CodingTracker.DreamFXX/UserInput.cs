@@ -60,4 +60,9 @@ internal class UserInput
 
         return duration.ToString();
     }
+
+    public int GetId()
+    {
+        throw new NotImplementedException();
+    }
 }
