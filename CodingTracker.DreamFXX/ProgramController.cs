@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace CodingTracker.DreamFXX;
 
