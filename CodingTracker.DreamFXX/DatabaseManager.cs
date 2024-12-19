@@ -87,10 +87,10 @@ public class DatabaseManager
     public CodingSession? ReadSingleRecord(int id)
     {
         var connection = new SqliteConnection(_connectionString);
-        var query = "SELECT * FROM MyCodingTracker WHERE Id = @id";
+        var query = "SELECT * FROM MyCodingTracker WHERE id = @id";
         var parameters = new
         {
-            Id = id
+            id = id
         };
 
         var codingSessions = connection.QuerySingleOrDefault<CodingSession>(query, parameters);

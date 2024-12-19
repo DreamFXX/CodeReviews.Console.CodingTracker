@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.Runtime.InteropServices;
+using Spectre.Console;
 
 namespace CodingTracker.DreamFXX;
 
@@ -73,14 +74,15 @@ public static class ProgramController
     private static void DisplayUpdateContextMenu()
     {
         AnsiConsole.Clear();
-        ViewAllRecords();
-
-        int id = Input.GetId();
 
         var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
-            .Title("[green]Select the type of Data you want to change.[/]")
+            .Title("[green]Select the type of Data you want to change in selected record.[/]")
             .PageSize(5)
             .AddChoices("Update Date", "Update Start and End Time", "Update All Attributes", "Go Back to Main Menu"));
+
+        ViewAllRecords();
+
+        int id = AnsiConsole.Ask<int>("Choose a record you want to update and enter its ID number: ");
 
         switch (updateChoice)
         {
@@ -113,11 +115,15 @@ public static class ProgramController
     private static void DeleteContextMenu()
     {
         AnsiConsole.Clear();
+
         var confirmation = AnsiConsole.Confirm("[green]Do you really want to delete records?[/]");
         if (confirmation)
         {
             AnsiConsole.Clear();
-            var idToDelete = Input.GetId();
+            ViewAllRecords();
+
+            var idToDelete = AnsiConsole.Ask<int>("Enter the ID of the record you want to update: ");
+
             var record = DbManager.ReadSingleRecord(idToDelete);
             if (record != null)
             {

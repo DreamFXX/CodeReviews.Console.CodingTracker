@@ -13,7 +13,7 @@ internal class UserInput
     public string? GetDate()
     {
         Date = AnsiConsole.Ask<string>(
-            "[yellow]Please, enter the date of your session. Specify date in this exact format![/]\n-[green](dd-MM-yy)[/] -> ");
+            "[yellow]Please, enter the date in exact formatas displayed below.[/]\n-[green](dd-MM-yy)[/] -> ");
         while (Date != null && !_dateTimeValidation.IsValidDate(Date))
         {
             AnsiConsole.MarkupLine("Invalid date! Expected format (mm-dd-yy)");
