@@ -75,7 +75,7 @@ public static class ProgramController
         AnsiConsole.Clear();
         ViewAllRecords();
 
-        var id = Input.GetId();
+        int id = Input.GetId();
 
         var updateChoice = AnsiConsole.Prompt(new SelectionPrompt<string>()
             .Title("[green]Select the type of Data you want to change.[/]")
